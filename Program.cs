@@ -9,6 +9,15 @@ WebApplicationBuilder builder =
 // Habilita os Controllers, incluindo o de conexão e o de vendas.
 builder.Services.AddControllers();
 
+// Permite que aplicações front-end de qualquer origem acessem a API.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+        policy.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
+
 // Registra uma única instância de ConexaoBanco para a aplicação.
 // Essa classe administra a fonte de dados e o conjunto de conexões.
 builder.Services.AddSingleton<ConexaoBanco>();
@@ -23,6 +32,9 @@ builder.Services.AddScoped<VendaService>();
 // Constrói a aplicação.
 // await using libera seus recursos quando ela for encerrada.
 await using WebApplication app = builder.Build();
+
+// Aplica CORS às rotas da API.
+app.UseCors("Frontend");
 
 // Disponibiliza as rotas dos Controllers registrados.
 app.MapControllers();
